@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package com.apehat.event;
+package com.apehat.event.example;
+
+import com.apehat.event.example.app.UserAppService;
+import com.apehat.event.example.infra.MemUserRepository;
+import org.testng.annotations.Test;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
+public class Main {
+
+    @Test
+    public void testRegister() {
+        String username = "aUsername";
+        String password = "aPassword";
+        new UserAppService(new MemUserRepository())
+                .register(username, password);
+    }
 }

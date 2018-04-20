@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package com.apehat.event;
+package com.apehat.event.example.domain.user;
+
+import com.apehat.event.AbstractEvent;
+import com.apehat.event.example.domain.DomainEvent;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
+public abstract class UserEvent extends AbstractEvent implements DomainEvent {
+
+    protected UserEvent(UserId userId) {
+        super(userId);
+    }
+
+    public UserId getUserId() {
+        return (UserId) triggerId();
+    }
 }

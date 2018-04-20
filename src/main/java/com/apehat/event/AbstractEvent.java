@@ -32,7 +32,9 @@ public abstract class AbstractEvent implements Event {
     private final int version;
 
     protected AbstractEvent(TriggerId triggerId) {
-        this(System.currentTimeMillis(), INITIAL_VERSION, triggerId);
+        this.triggerId = Objects.requireNonNull(triggerId);
+        this.occurredTimeMillis = System.currentTimeMillis();
+        version = INITIAL_VERSION;
     }
 
     /**

@@ -14,11 +14,28 @@
  * limitations under the License.
  */
 
-package com.apehat.event;
+package com.apehat.event.example.domain.user;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
+public final class UserRegistered extends UserEvent {
+
+    private final String username;
+
+    public UserRegistered(UserId userId, String username) {
+        super(userId);
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public String toString() {
+        return "UserRegistered{" + "username='" + username + '\'' + "} " + super
+                .toString();
+    }
 }

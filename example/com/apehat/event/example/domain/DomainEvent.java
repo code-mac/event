@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.apehat.event.example.application;
+package com.apehat.event.example.domain;
+
+import com.apehat.event.Event;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public class ApplicationEvent {}
+public interface DomainEvent extends Event {
+}

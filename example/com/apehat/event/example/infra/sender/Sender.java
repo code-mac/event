@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.apehat.event;
+package com.apehat.event.example.infra.sender;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
+public interface Sender {
+
+    void send(String message);
 }

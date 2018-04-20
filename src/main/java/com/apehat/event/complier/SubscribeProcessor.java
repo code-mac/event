@@ -50,7 +50,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
     }
 
     private void error(Element element, Object... args) {
-        messager.printMessage(Diagnostic.Kind.ERROR, String.format("Only element can be annotated with @%s", args), element);
+        messager.printMessage(Diagnostic.Kind.ERROR, String
+                .format("Only element can be annotated with @%s", args), element);
     }
 
     @Override
@@ -67,7 +68,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
     private Set<AnnotatedMethod> subscriberAnnotatedMethods(RoundEnvironment roundEnv) {
         Set<AnnotatedMethod> methods = new HashSet<>();
         // the elements what had be annotated by Subscriber
-        Set<? extends Element> subAnnotationMethods = roundEnv.getElementsAnnotatedWith(Subscribe.class);
+        Set<? extends Element> subAnnotationMethods = roundEnv
+                .getElementsAnnotatedWith(Subscribe.class);
         for (Element element : subAnnotationMethods) {
             Subscribe subscribe = element.getAnnotation(Subscribe.class);
             try {
@@ -84,7 +86,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
     private Set<AnnotatedMethod> subscribersAnnotatedMethods(RoundEnvironment roundEnv) {
         Set<AnnotatedMethod> methods = new HashSet<>();
         // the elements what had be annotated by Subscribers
-        Set<? extends Element> subsAnnotationMethods = roundEnv.getElementsAnnotatedWith(Subscribes.class);
+        Set<? extends Element> subsAnnotationMethods = roundEnv
+                .getElementsAnnotatedWith(Subscribes.class);
         Element currentElement = null;
         try {
             for (Element element : subsAnnotationMethods) {
@@ -104,7 +107,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
     }
 
     private void processSubscribe(Set<AnnotatedMethod> methods) {
-        messager.printMessage(Diagnostic.Kind.NOTE, "Process " + methods.toString());
+        messager.printMessage(Diagnostic.Kind.NOTE, "Process " + methods
+                .toString());
     }
 
     @Override
@@ -158,7 +162,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
                 return false;
             }
             AnnotatedMethod method = (AnnotatedMethod) o;
-            return annotation.equals(method.annotation) && element.equals(method.element);
+            return annotation.equals(method.annotation) && element
+                    .equals(method.element);
         }
 
         @Override

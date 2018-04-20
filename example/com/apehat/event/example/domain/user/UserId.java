@@ -14,11 +14,26 @@
  * limitations under the License.
  */
 
-package com.apehat.event;
+package com.apehat.event.example.domain.user;
+
+import com.apehat.event.TriggerId;
+
+import java.util.Objects;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
+public final class UserId implements TriggerId {
+
+    private final String source;
+
+    public UserId(String source) {
+        this.source = Objects.requireNonNull(source);
+    }
+
+    @Override
+    public String toString() {
+        return source;
+    }
 }

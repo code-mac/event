@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.apehat.event;
+package com.apehat.event.example.domain.user;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
+public interface UserRepository {
+
+    void store(User user);
 }

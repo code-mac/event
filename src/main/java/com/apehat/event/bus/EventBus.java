@@ -18,6 +18,7 @@ package com.apehat.event.bus;
 
 import com.apehat.event.Event;
 import com.apehat.event.Subscriber;
+import com.apehat.event.bus.impl.DefaultSubscriberRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +58,13 @@ public class EventBus {
     private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
 
     /** The subscriber register be used to register subscribers */
-    private final SubscriberRegister register;
+    private final SubscriberRegister subscriberRegister;
 
     private final Lock publishLock = new ReentrantLock();
 
     private EventBus(Builder builder) {
         this.id = builder.id;
-        this.register = builder.subscriberRegister;
+        this.subscriberRegister = builder.subscriberRegister;
         this.exceptionHandler = builder.exceptionHandler;
     }
 
@@ -88,7 +89,7 @@ public class EventBus {
     }
 
     public <T extends Event> void subscribe(Subscriber<? extends T> subscriber) {
-        register.register(subscriber);
+        subscriberRegister.register(subscriber);
     }
 
     /**
@@ -138,7 +139,7 @@ public class EventBus {
         // convert safe;
         // the event type must be Class<T>
         // determine by parameter
-        return register.subscribersOf(event);
+        return subscriberRegister.subscribersOf(event);
     }
 
     /**
@@ -170,14 +171,49 @@ public class EventBus {
     }
 
     /**
-     * Returns the exception exceptionHandler of this. If the exception exceptionHandler hadn't
-     * be set, will return {@code DEFAULT_EXCEPTION_HANDLER}
+     * Returns the exception exceptionHandler of this. If the exception
+     * handler hadn't be set, will return {@code DEFAULT_EXCEPTION_HANDLER}
      *
      * @return the exception exceptionHandler of this, or {@code
      * DEFAULT_EXCEPTION_HANDLER} if the exception exceptionHandler hadn't be set
      */
     public ExceptionHandler getExceptionHandler() {
         return exceptionHandler;
+    }
+
+    /**
+     * Returns an unmodifiable subscriber subscriberRegister of the current event bus.
+     * <p>
+     * The subscriberRegister can carried out query instructions, like
+     * {@link SubscriberRegister#subscribersOf(Event)} and so on.
+     * Else, will throw {@link UnsupportedOperationException}
+     *
+     * @return an unmodifiable subscriber subscriberRegister of the current event bus
+     */
+    public SubscriberRegister getSubscriberRegister() {
+        return new SubscriberRegister() {
+            @Override
+            public <T extends Event> void register(Subscriber<T> subscriber) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public <T extends Event> void unregister(Subscriber<T> subscriber) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public <T extends Event> Set<Subscriber<? super T>> subscribersOf(T event) {
+                Set<Subscriber<? super T>> subscribers = subscriberRegister
+                        .subscribersOf(event);
+                return Collections.unmodifiableSet(subscribers);
+            }
+
+            @Override
+            public boolean contains(Subscriber<?> subscriber) {
+                return subscriberRegister.contains(subscriber);
+            }
+        };
     }
 
     @Override
@@ -211,25 +247,25 @@ public class EventBus {
 
         public Builder(String id) {
             if (BUS_CACHE_POOL.get(id) != null) {
-                throw new IllegalArgumentException(String.format("Event bus with id %s already exists.", id));
+                throw new IllegalArgumentException(String
+                        .format("Event bus with id %s already exists.", id));
             }
             this.id = Objects.requireNonNull(id);
         }
 
         /**
-         * Sets the exception exceptionHandler of this. If the specified exceptionHandler is null,
-         * will use {@code DEFAULT_EXCEPTION_HANDLER}.
+         * Sets the exception exceptionHandler of this.
          *
          * @param exceptionHandler the exception exceptionHandler to be use
          */
         public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-            this.exceptionHandler = exceptionHandler == null ? DEFAULT_EXCEPTION_HANDLER : exceptionHandler;
+            this.exceptionHandler = exceptionHandler;
         }
 
         /**
-         * Set the subscriber register to event bus.
+         * Set the subscriber subscriberRegister to event bus.
          *
-         * @param subscriberRegister the register
+         * @param subscriberRegister the subscriberRegister
          */
         public void setSubscriberRegister(SubscriberRegister subscriberRegister) {
             this.subscriberRegister = subscriberRegister;
@@ -245,53 +281,11 @@ public class EventBus {
                 exceptionHandler = DEFAULT_EXCEPTION_HANDLER;
             }
             if (subscriberRegister == null) {
-                subscriberRegister = new SubscriberRegisterImpl();
+                subscriberRegister = new DefaultSubscriberRegister();
             }
             EventBus eventBus = new EventBus(this);
             BUS_CACHE_POOL.put(id, eventBus);
             return eventBus;
-        }
-    }
-
-    private static class SubscriberRegisterImpl implements SubscriberRegister {
-
-        @Override
-        public void clear() {}
-
-        @Override
-        public <T extends Event> void register(Subscriber<T> subscriber) {}
-
-        @Override
-        public <T extends Event> Set<Subscriber<? super T>> subscribersOf(T event) {
-            Subscriber<T> subscriber = new Subscriber<T>() {
-                @Override
-                public Class<? extends T> subscribeTo() {
-                    //noinspection unchecked
-                    return (Class<? extends T>) event.getClass();
-                }
-
-                @Override
-                public void onEvent(T event) {
-                    System.out.println("Handle event " + event);
-                }
-            };
-
-            Subscriber<Event> globalSubscriber = new Subscriber<Event>() {
-                @Override
-                public Class<? extends Event> subscribeTo() {
-                    return Event.class;
-                }
-
-                @Override
-                public void onEvent(Event event) {
-                    System.out.println("Global handle event " + event);
-                }
-            };
-
-            Set<Subscriber<? super T>> subscribers = new HashSet<>();
-            subscribers.add(globalSubscriber);
-            subscribers.add(subscriber);
-            return subscribers;
         }
     }
 }

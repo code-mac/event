@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package com.apehat.event;
+package com.apehat.event.example.domain.user;
+
+import com.apehat.event.Subscriber;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
+public final class EmailSender implements Subscriber<UserEvent> {
+
+    @Override
+    public Class<? extends UserEvent> subscribeTo() {
+        return UserEvent.class;
+    }
+
+    @Override
+    public void onEvent(UserEvent event) {
+        System.out.println(getClass() + " handle " + event);
+    }
 }

@@ -17,6 +17,7 @@
 package com.apehat.event.bus;
 
 import com.apehat.event.Event;
+import com.apehat.event.SubscribeScope;
 import com.apehat.event.Subscriber;
 
 import java.util.Set;
@@ -27,9 +28,41 @@ import java.util.Set;
  */
 public interface SubscriberRegister {
 
-    void clear();
-
+    /**
+     * Register a subscriber to current register.
+     * <p>
+     * If the scope of subscriber is {@link SubscribeScope#GLOBAL}
+     * the register will be find by all register.
+     *
+     * @param subscriber the subscriber to register
+     * @throws NullPointerException the specified subscriber is null
+     * @see SubscribeScope
+     */
     <T extends Event> void register(Subscriber<T> subscriber);
 
+    /**
+     * @implSpec
+     */
+    <T extends Event> void unregister(Subscriber<T> subscriber);
+
+    /**
+     * Returns the subscribers of specified event.
+     *
+     * @param event the event to get the subscribers
+     * @param <T>   the type of event
+     * @return the subscribers of specified event, or empty set, if does not
+     * have subscribers of specified event
+     * @throws NullPointerException the specified event is null
+     */
     <T extends Event> Set<Subscriber<? super T>> subscribersOf(T event);
+
+    /**
+     * Determine whether the current register contains specified subscriber.
+     *
+     * @param subscriber the subscriber to check
+     * @return true, if the current register contains specified subscriber,
+     * else, otherwise false
+     * @throws NullPointerException specified subscriber is null
+     */
+    boolean contains(Subscriber<?> subscriber);
 }

@@ -18,6 +18,7 @@ package com.apehat.event.bus;
 
 import com.apehat.event.AbstractEvent;
 import com.apehat.event.Event;
+import com.apehat.event.Subscriber;
 import com.apehat.event.TriggerId;
 import org.testng.annotations.Test;
 
@@ -29,10 +30,20 @@ public class EventBusTest {
 
     @Test
     public void testSubmit() {
-        //        EventBus eventBus = EventBus.getDefault();
+        EventBus eventBus = EventBus.getDefault();
+        eventBus.subscribe(new Subscriber<Event>() {
+            @Override
+            public Class<? extends Event> subscribeTo() {
+                return Event.class;
+            }
+
+            @Override
+            public void onEvent(Event event) {
+                System.out.println("Handle event " + event);
+            }
+        });
         Event e = new E(EventBusTest.class.getName());
-        //        eventBus.submit(e);
-        e.publish();
+        eventBus.submit(e);
     }
 
     private class E extends AbstractEvent {

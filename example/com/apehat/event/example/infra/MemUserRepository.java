@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package com.apehat.event;
+package com.apehat.event.example.infra;
+
+import com.apehat.event.example.domain.user.User;
+import com.apehat.event.example.domain.user.UserRepository;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
+public class MemUserRepository implements UserRepository {
+    @Override
+    public void store(User user) {
+        System.out.println("Stored user " + user);
+    }
 }
