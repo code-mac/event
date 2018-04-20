@@ -16,7 +16,7 @@
 
 package com.apehat.event.example.domain.user;
 
-import com.apehat.event.Publisher;
+import com.apehat.event.EventBus;
 
 import java.util.Objects;
 
@@ -24,7 +24,7 @@ import java.util.Objects;
  * @author hanpengfei
  * @since 1.0
  */
-public final class User implements Publisher<UserEvent> {
+public final class User {
 
     private final UserId userId;
 
@@ -37,7 +37,7 @@ public final class User implements Publisher<UserEvent> {
         setUsername(username);
         this.password = Objects.requireNonNull(password);
 
-        new UserRegistered(userId, username).publish();
+        EventBus.getDefault().submit(new UserRegistered(userId, username));
     }
 
     public void setUsername(String username) {

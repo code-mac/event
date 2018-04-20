@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.apehat.event.bus;
+package com.apehat.event.internal.subscriber;
 
 import com.apehat.event.Event;
 import com.apehat.event.SubscribeScope;
@@ -41,7 +41,10 @@ public interface SubscriberRegister {
     <T extends Event> void register(Subscriber<T> subscriber);
 
     /**
-     * @implSpec
+     * Unregister the specified subscriber form this.
+     *
+     * @param subscriber the subscriber to unregister
+     * @throws NullPointerException the specified subscriber is null
      */
     <T extends Event> void unregister(Subscriber<T> subscriber);
 
@@ -65,4 +68,13 @@ public interface SubscriberRegister {
      * @throws NullPointerException specified subscriber is null
      */
     boolean contains(Subscriber<?> subscriber);
+
+    /**
+     * Determine whether specified subscriber can register by this register.
+     *
+     * @param subscriber the subscriber to check
+     * @return true, current register can register specified subscriber;
+     * otherwise false
+     */
+    boolean registrable(Subscriber<?> subscriber);
 }

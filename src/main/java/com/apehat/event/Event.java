@@ -16,8 +16,6 @@
 
 package com.apehat.event;
 
-import com.apehat.event.bus.EventBus;
-
 import java.io.Serializable;
 
 /**
@@ -54,13 +52,5 @@ public interface Event extends Serializable {
      */
     default int version() {
         return INITIAL_VERSION;
-    }
-
-    /**
-     * Publish current event.
-     */
-    default void publish() {
-        // 获取调用者，当调用者为一个发布者时，获取发布者的 bus
-        EventBus.getDefault().submit(this);
     }
 }

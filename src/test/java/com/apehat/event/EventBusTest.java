@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package com.apehat.event.bus;
+package com.apehat.event;
 
-import com.apehat.event.AbstractEvent;
-import com.apehat.event.Event;
-import com.apehat.event.Subscriber;
-import com.apehat.event.TriggerId;
 import org.testng.annotations.Test;
 
 /**

@@ -16,23 +16,20 @@
 
 package com.apehat.event;
 
-import com.apehat.event.bus.EventBus;
-
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public interface Publisher<T extends Event> {
+@FunctionalInterface
+public interface ExceptionHandler {
 
     /**
-     * Publisher the event by event bus.
-     * <p>
-     * Default, use {@link EventBus#getDefault()} to publish.
+     * Handler the subscribe exception.
      *
-     * @param event the event to publish
-     * @see EventBus#getDefault()
+     * @param e          the exception
+     * @param event      the event
+     * @param subscriber the subscriber
+     * @param <T>        the type of event
      */
-    default void publish(T event) {
-        EventBus.getDefault().submit(event);
-    }
+    <T extends Event> void handle(Exception e, T event, Subscriber<? super T> subscriber);
 }

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.apehat.event.bus.impl;
+package com.apehat.event.internal.subscriber;
 
 import com.apehat.event.Event;
 import com.apehat.event.Subscriber;
-import com.apehat.event.bus.AbstractSubscriberRegister;
-import com.apehat.event.bus.SubscriberRegister;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * @author hanpengfei
@@ -38,15 +37,16 @@ public class DefaultSubscriberRegister extends AbstractSubscriberRegister {
     private final ThreadSubscriberRegister threadSubscriberRegister = new ThreadSubscriberRegister();
 
     @Override
-    protected <T extends Event> void doRegister(TimeStampedSubscriber<T> subscriber) {
-        assert subscriber != null;
-        if (isGlobalSubscriber(subscriber)) {
-            globalSubscriberRegister.register(subscriber);
-        } else if (isBusSubscriber(subscriber)) {
-            busSubscriberRegister.register(subscriber);
-        } else {
-            threadSubscriberRegister.register(subscriber);
-        }
+    protected void doRegister(TimeStampedSubscriber<?> subscriber) {
+        globalSubscriberRegister.register(subscriber);
+        busSubscriberRegister.register(subscriber);
+        threadSubscriberRegister.register(subscriber);
+    }
+
+    @Override
+    protected SortedSet<TimeStampedSubscriber<?>> allSubscribers() {
+        // needn't impl
+        return null;
     }
 
     @Override
@@ -71,5 +71,10 @@ public class DefaultSubscriberRegister extends AbstractSubscriberRegister {
                 .contains(subscriber) || busSubscriberRegister
                 .contains(subscriber) || threadSubscriberRegister
                 .contains(subscriber);
+    }
+
+    @Override
+    public boolean registrable(Subscriber<?> subscriber) {
+        return subscriber != null;
     }
 }

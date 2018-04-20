@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.apehat.event.bus;
+package com.apehat.event;
 
-import com.apehat.event.Event;
-import com.apehat.event.Subscriber;
-import com.apehat.event.bus.impl.DefaultSubscriberRegister;
+import com.apehat.event.internal.subscriber.DefaultSubscriberRegister;
+import com.apehat.event.internal.subscriber.SubscriberRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,13 +57,12 @@ public class EventBus {
     private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
 
     /** The subscriber register be used to register subscribers */
-    private final SubscriberRegister subscriberRegister;
+    private final SubscriberRegister subscriberRegister = new DefaultSubscriberRegister();
 
     private final Lock publishLock = new ReentrantLock();
 
     private EventBus(Builder builder) {
         this.id = builder.id;
-        this.subscriberRegister = builder.subscriberRegister;
         this.exceptionHandler = builder.exceptionHandler;
     }
 
@@ -213,6 +211,11 @@ public class EventBus {
             public boolean contains(Subscriber<?> subscriber) {
                 return subscriberRegister.contains(subscriber);
             }
+
+            @Override
+            public boolean registrable(Subscriber<?> subscriber) {
+                return subscriberRegister.registrable(subscriber);
+            }
         };
     }
 
@@ -243,7 +246,6 @@ public class EventBus {
 
         private String id;
         private ExceptionHandler exceptionHandler;
-        private SubscriberRegister subscriberRegister;
 
         public Builder(String id) {
             if (BUS_CACHE_POOL.get(id) != null) {
@@ -263,15 +265,6 @@ public class EventBus {
         }
 
         /**
-         * Set the subscriber subscriberRegister to event bus.
-         *
-         * @param subscriberRegister the subscriberRegister
-         */
-        public void setSubscriberRegister(SubscriberRegister subscriberRegister) {
-            this.subscriberRegister = subscriberRegister;
-        }
-
-        /**
          * Build the event bus
          *
          * @return a event instance
@@ -279,9 +272,6 @@ public class EventBus {
         public EventBus build() {
             if (exceptionHandler == null) {
                 exceptionHandler = DEFAULT_EXCEPTION_HANDLER;
-            }
-            if (subscriberRegister == null) {
-                subscriberRegister = new DefaultSubscriberRegister();
             }
             EventBus eventBus = new EventBus(this);
             BUS_CACHE_POOL.put(id, eventBus);

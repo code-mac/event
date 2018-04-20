@@ -14,25 +14,31 @@
  * limitations under the License.
  */
 
-package com.apehat.event.bus;
+package com.apehat.event.internal.subscriber;
 
-import com.apehat.event.Event;
+import com.apehat.event.SubscribeScope;
 import com.apehat.event.Subscriber;
+
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-@FunctionalInterface
-public interface ExceptionHandler {
+public class BusSubscriberRegister extends AbstractSubscriberRegister {
 
-    /**
-     * Handler the subscribe exception.
-     *
-     * @param e          the exception
-     * @param event      the event
-     * @param subscriber the subscriber
-     * @param <T>        the type of event
-     */
-    <T extends Event> void handle(Exception e, T event, Subscriber<? super T> subscriber);
+    private final Set<TimeStampedSubscriber<?>> subscribers = new ConcurrentSkipListSet<>();
+
+    @Override
+    protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
+        return subscribers;
+    }
+
+    @Override
+    public boolean registrable(Subscriber<?> subscriber) {
+        return Objects.equals(subscriber.scope(), SubscribeScope.BUS);
+    }
 }

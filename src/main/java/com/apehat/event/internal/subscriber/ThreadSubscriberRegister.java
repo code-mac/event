@@ -14,28 +14,30 @@
  * limitations under the License.
  */
 
-package com.apehat.event.bus;
+package com.apehat.event.internal.subscriber;
 
-import com.apehat.event.Event;
+import com.apehat.event.SubscribeScope;
 import com.apehat.event.Subscriber;
-import org.slf4j.Logger;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public final class ExceptionLogger implements ExceptionHandler {
+public class ThreadSubscriberRegister extends AbstractSubscriberRegister {
 
-    private final Logger logger;
+    private final Map<Long, Set<TimeStampedSubscriber<?>>> threadMap = new ConcurrentHashMap<>();
 
-    public ExceptionLogger(Logger logger) {
-        this.logger = Objects.requireNonNull(logger);
+    @Override
+    protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
+        return threadMap.computeIfAbsent(Thread.currentThread()
+                .getId(), k -> new HashSet<>());
     }
 
     @Override
-    public <T extends Event> void handle(Exception e, T event, Subscriber<? super T> subscriber) {
-        logger.error("Exception occurred on [{}] onEvent event [{}]: [{}]", subscriber, event, e);
+    public boolean registrable(Subscriber<?> subscriber) {
+        return Objects.equals(subscriber.scope(), SubscribeScope.THREAD);
     }
 }
