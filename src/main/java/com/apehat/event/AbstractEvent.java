@@ -44,11 +44,9 @@ public abstract class AbstractEvent implements Event {
      * @throws IllegalArgumentException the parent version less than 1
      * @see #version()
      */
-    protected AbstractEvent(long occurredTimeMillis, int parentVersion,
-                            TriggerId triggerId) {
+    protected AbstractEvent(long occurredTimeMillis, int parentVersion, TriggerId triggerId) {
         if (parentVersion < INITIAL_VERSION) {
-            throw new IllegalArgumentException(
-                    "The version of parent mustn't less than 1.");
+            throw new IllegalArgumentException("The version of parent mustn't less than 1.");
         }
         this.triggerId = Objects.requireNonNull(triggerId);
         this.occurredTimeMillis = occurredTimeMillis;
@@ -72,10 +70,6 @@ public abstract class AbstractEvent implements Event {
 
     @Override
     public String toString() {
-        return "AbstractEvent{" +
-                "triggerId=" + triggerId +
-                ", occurredTimeMillis=" + occurredTimeMillis +
-                ", version=" + version +
-                '}';
+        return "AbstractEvent{" + "triggerId=" + triggerId + ", occurredTimeMillis=" + occurredTimeMillis + ", version=" + version + '}';
     }
 }

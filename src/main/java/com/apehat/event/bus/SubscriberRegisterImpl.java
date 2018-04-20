@@ -36,8 +36,7 @@ public final class SubscriberRegisterImpl implements SubscriberRegister {
         ServiceLoader<Subscriber> configuredSubscribers = ServiceLoader.load(Subscriber.class);
         for (Subscriber subscriber : configuredSubscribers) {
             if (!SubscribeScope.GLOBAL.equals(subscriber.scope())) {
-                throw new ExceptionInInitializerError(
-                        subscriber.getClass() + " must have global scope.");
+                throw new ExceptionInInitializerError(subscriber.getClass() + " must have global scope.");
             }
 
             @SuppressWarnings("unchecked") Class<? extends Event> eventType = subscriber.subscribeTo();
@@ -53,10 +52,8 @@ public final class SubscriberRegisterImpl implements SubscriberRegister {
         GLOBAL_SUBSCRIBERS = Collections.unmodifiableMap(temp);
     }
 
-    private final Map<Class<? extends Event>, Set<SubscriberWrapper>>
-            busGlobalSubscribers = new HashMap<>();
-    private final Map<Class<? extends Event>, Stack<SubscriberWrapper>>
-            threadLocalSubscribers = new HashMap<>();
+    private final Map<Class<? extends Event>, Set<SubscriberWrapper>> busGlobalSubscribers = new HashMap<>();
+    private final Map<Class<? extends Event>, Stack<SubscriberWrapper>> threadLocalSubscribers = new HashMap<>();
 
     /**
      * Determine whether the specified subscriber have bus global scope.
@@ -148,8 +145,7 @@ public final class SubscriberRegisterImpl implements SubscriberRegister {
     /**
      * A subscriber wrapper class, mark subscriber with a timestamp
      */
-    private static class SubscriberWrapper<T extends Event> implements
-            Subscriber<T> {
+    private static class SubscriberWrapper<T extends Event> implements Subscriber<T> {
 
         private final long timestamp;
         private final Subscriber<T> subscriber;
@@ -168,8 +164,7 @@ public final class SubscriberRegisterImpl implements SubscriberRegister {
                 return false;
             }
             SubscriberWrapper subscriberWrapper = (SubscriberWrapper) o;
-            return timestamp == subscriberWrapper.timestamp
-                    && subscriber.equals(subscriberWrapper.subscriber);
+            return timestamp == subscriberWrapper.timestamp && subscriber.equals(subscriberWrapper.subscriber);
         }
 
         @Override

@@ -36,7 +36,6 @@ public final class ExceptionLogger implements ExceptionHandler {
 
     @Override
     public <T extends Event> void handle(Exception e, T event, Subscriber<? super T> subscriber) {
-        logger.error("Exception occurred on [{}] onEvent event [{}]: [{}]",
-                subscriber, event, e);
+        logger.error("Exception occurred on [{}] onEvent event [{}]: [{}]", subscriber, event, e);
     }
 }

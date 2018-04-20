@@ -20,5 +20,4 @@ package com.apehat.event.source;
  * @author hanpengfei
  * @since 1.0
  */
-public final class EventStreamId {
-}
+public final class EventStreamId {}

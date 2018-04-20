@@ -95,12 +95,4 @@ Temporary Items
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
-.idea/workspace.xml
-example/
-src/.DS_Store
-src/main/.DS_Store
-src/main/java/.DS_Store
-src/main/java/com/.DS_Store
-src/main/java/com/apehat/.DS_Store
-src/main/java/com/apehat/event/.DS_Store
 target/

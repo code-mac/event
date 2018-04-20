@@ -20,5 +20,4 @@ package com.apehat.event;
  * @author hanpengfei
  * @since 1.0
  */
-public interface TriggerId {
-}
+public interface TriggerId {}

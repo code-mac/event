@@ -29,9 +29,9 @@ public class EventBusTest {
 
     @Test
     public void testSubmit() {
-//        EventBus eventBus = EventBus.getDefault();
+        //        EventBus eventBus = EventBus.getDefault();
         Event e = new E(EventBusTest.class.getName());
-//        eventBus.submit(e);
+        //        eventBus.submit(e);
         e.publish();
     }
 

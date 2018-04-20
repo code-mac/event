@@ -39,32 +39,27 @@ public class EventBus {
     private static final Logger log = LoggerFactory.getLogger(EventBus.class);
 
     private static final Map<String, EventBus> BUS_CACHE_POOL = new ConcurrentHashMap<>();
-    /**
-     * The default event bus id
-     */
+
+    /** The default event bus id */
     private static final String DEFAULT_ID = "default";
 
     static {
         BUS_CACHE_POOL.put(DEFAULT_ID, new Builder(DEFAULT_ID).build());
     }
 
-    /**
-     * The id of event bus
-     */
+    /** The id of event bus */
     private final String id;
-    /**
-     * The exception exceptionHandler, be used to handle exception, when submitted an
-     * event.
-     */
+
+    /** The exception handler, be used to handle subscribe exception */
     private final ExceptionHandler exceptionHandler;
-    /**
-     * The event queue be used to store events, what's waiting to publish.
-     */
+
+    /** The event queue be used to store events, what's waiting to publish. */
     private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
-    /**
-     * The subscriber register be used to register subscriber
-     */
+
+    /** The subscriber register be used to register subscribers */
     private final SubscriberRegister register;
+
+    private final Lock publishLock = new ReentrantLock();
 
     private EventBus(Builder builder) {
         this.id = builder.id;
@@ -106,8 +101,6 @@ public class EventBus {
         eventQueue.add(Objects.requireNonNull(event));
         publish();
     }
-
-    private final Lock publishLock = new ReentrantLock();
 
     /**
      * Check {@code eventQueue} and publish event
@@ -157,8 +150,7 @@ public class EventBus {
      * @param subscriber the subscriber
      * @param <T>        the type of event
      */
-    private <T extends Event> void invokeSubscriberHandler(
-            T event, Subscriber<? super T> subscriber) {
+    private <T extends Event> void invokeSubscriberHandler(T event, Subscriber<? super T> subscriber) {
         assert event != null;
         assert subscriber != null;
         try {
@@ -207,15 +199,11 @@ public class EventBus {
         return result;
     }
 
-    /**
-     * Event Bus Builder
-     */
+    /** Event Bus Builder */
     public static class Builder {
-        /**
-         * The default exception exceptionHandler, use logger to record exception.
-         */
-        private static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER =
-                new ExceptionLogger(log);
+
+        /** The default exception handler, use logger to record exception. */
+        private static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER = new ExceptionLogger(log);
 
         private String id;
         private ExceptionHandler exceptionHandler;
@@ -223,8 +211,7 @@ public class EventBus {
 
         public Builder(String id) {
             if (BUS_CACHE_POOL.get(id) != null) {
-                throw new IllegalArgumentException(String.format(
-                        "Event bus with id %s already exists.", id));
+                throw new IllegalArgumentException(String.format("Event bus with id %s already exists.", id));
             }
             this.id = Objects.requireNonNull(id);
         }
@@ -236,8 +223,7 @@ public class EventBus {
          * @param exceptionHandler the exception exceptionHandler to be use
          */
         public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-            this.exceptionHandler = exceptionHandler == null ?
-                    DEFAULT_EXCEPTION_HANDLER : exceptionHandler;
+            this.exceptionHandler = exceptionHandler == null ? DEFAULT_EXCEPTION_HANDLER : exceptionHandler;
         }
 
         /**
@@ -270,14 +256,10 @@ public class EventBus {
     private static class SubscriberRegisterImpl implements SubscriberRegister {
 
         @Override
-        public void clear() {
-
-        }
+        public void clear() {}
 
         @Override
-        public <T extends Event> void register(Subscriber<T> subscriber) {
-
-        }
+        public <T extends Event> void register(Subscriber<T> subscriber) {}
 
         @Override
         public <T extends Event> Set<Subscriber<? super T>> subscribersOf(T event) {
