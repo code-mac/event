@@ -1,5 +1,5 @@
 /*
- * Copyright ApeHat.com
+ * Copyright Apehat.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import java.lang.annotation.*;
  * Subscribe events by defined {@code Subscriber}s.
  * <p>
  * The annotation {@code Subscribe} is an compile time annotation. i.e. the
- * process action happened at compile time, and the generated class file will
- * be modifier at compile time.
+ * process action happened at compile time, and the generated class file will be
+ * modifier at compile time.
  * <p>
  * The specified {@code subscriber} must have no parameter constructor; the
  * specified {@code EventSubscribers} must can onEvent the type of specified
