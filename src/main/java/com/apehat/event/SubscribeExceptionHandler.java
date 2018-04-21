@@ -21,15 +21,19 @@ package com.apehat.event;
  * @since 1.0
  */
 @FunctionalInterface
-public interface ExceptionHandler {
+public interface SubscribeExceptionHandler {
 
     /**
      * Handler the subscribe exception.
      *
-     * @param e          the exception
-     * @param event      the event
-     * @param subscriber the subscriber
-     * @param <T>        the type of event
+     * @param e
+     *         the exception
+     * @param event
+     *         the event
+     * @param subscriber
+     *         the subscriber
+     * @param <T>
+     *         the type of event
      */
     <T extends Event> void handle(Exception e, T event,
                                   Subscriber<? super T> subscriber);
