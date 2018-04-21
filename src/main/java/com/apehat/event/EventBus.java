@@ -21,8 +21,10 @@ import com.apehat.event.internal.subscriber.SubscriberRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,32 +40,25 @@ public class EventBus {
 
     private static final Logger log = LoggerFactory.getLogger(EventBus.class);
 
-    private static final Map<String, EventBus> BUS_CACHE_POOL = new ConcurrentHashMap<>();
-
-    /** The default event bus id */
-    private static final String DEFAULT_ID = "default";
-
-    static {
-        BUS_CACHE_POOL.put(DEFAULT_ID, new Builder(DEFAULT_ID).build());
-    }
-
-    /** The id of event bus */
-    private final String id;
+    private static final Builder DEFAULT_BUILDER = new Builder();
 
     /** The exception handler, be used to handle subscribe exception */
     private final ExceptionHandler exceptionHandler;
 
     /** The event queue be used to store events, what's waiting to publish. */
-    private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<Event> eventQueue;
 
     /** The subscriber register be used to register subscribers */
-    private final SubscriberRegister subscriberRegister = new SubscriberRAMRegister();
+    private final SubscriberRegister subscriberRegister;
 
-    private final Lock publishLock = new ReentrantLock();
+    private final Lock publishLock;
 
     private EventBus(Builder builder) {
-        this.id = builder.id;
         this.exceptionHandler = builder.exceptionHandler;
+
+        publishLock = new ReentrantLock();
+        eventQueue = new ConcurrentLinkedQueue<>();
+        subscriberRegister = new SubscriberRAMRegister();
     }
 
     /**
@@ -72,18 +67,7 @@ public class EventBus {
      * @return the default event bus
      */
     public static EventBus getDefault() {
-        return get(DEFAULT_ID);
-    }
-
-    /**
-     * Returns the event bus by specified id.
-     *
-     * @param id the id of event bus
-     * @return the event bus with specified id, or null if non event bus with
-     * specified id
-     */
-    public static EventBus get(final String id) {
-        return ThreadLocal.withInitial(() -> BUS_CACHE_POOL.get(id)).get();
+        return DEFAULT_BUILDER.build();
     }
 
     public <T extends Event> void subscribe(Subscriber<? extends T> subscriber) {
@@ -167,15 +151,6 @@ public class EventBus {
     }
 
     /**
-     * Returns the id of current event bus.
-     *
-     * @return the current event bus id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
      * Returns the exception exceptionHandler of this. If the exception
      * handler hadn't be set, will return {@code DEFAULT_EXCEPTION_HANDLER}
      *
@@ -231,41 +206,13 @@ public class EventBus {
         };
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof EventBus)) {
-            return false;
-        }
-        EventBus eventBus = (EventBus) o;
-        return id.equals(eventBus.id);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = 253;
-        result += 31 * id.hashCode();
-        return result;
-    }
-
     /** Event Bus Builder */
     public static class Builder {
 
         /** The default exception handler, use logger to record exception. */
         private static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER = new ExceptionLogger(log);
 
-        private String id;
         private ExceptionHandler exceptionHandler;
-
-        public Builder(String id) {
-            if (BUS_CACHE_POOL.get(id) != null) {
-                throw new IllegalArgumentException(String
-                        .format("Event bus with id %s already exists.", id));
-            }
-            this.id = Objects.requireNonNull(id);
-        }
 
         /**
          * Sets the exception exceptionHandler of this.
@@ -285,9 +232,7 @@ public class EventBus {
             if (exceptionHandler == null) {
                 exceptionHandler = DEFAULT_EXCEPTION_HANDLER;
             }
-            EventBus eventBus = new EventBus(this);
-            BUS_CACHE_POOL.put(id, eventBus);
-            return eventBus;
+            return new EventBus(this);
         }
     }
 }
