@@ -16,6 +16,7 @@
 
 package com.apehat.event;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 /**
@@ -24,9 +25,11 @@ import org.testng.annotations.Test;
  */
 public class EventBusTest {
 
-    @Test
+    static int count = 0;
+
+    @Test(threadPoolSize = 2, invocationCount = 300)
     public void testSubmit() {
-        EventBus eventBus = EventBus.getDefault();
+        EventBus eventBus = EventBus.getDefault().reset();
         eventBus.subscribe(new Subscriber<Event>() {
             @Override
             public Class<? extends Event> subscribeTo() {
@@ -36,10 +39,16 @@ public class EventBusTest {
             @Override
             public void onEvent(Event event) {
                 System.out.println("Handle event " + event);
+                count++;
             }
         });
         Event e = new E(EventBusTest.class.getName());
         eventBus.submit(e);
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        System.out.println(count);
     }
 
     private class E extends AbstractEvent {
