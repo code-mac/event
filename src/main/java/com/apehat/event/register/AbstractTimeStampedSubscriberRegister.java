@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.apehat.event.internal.subscriber;
+package com.apehat.event.register;
 
 import com.apehat.event.Event;
 import com.apehat.event.SubscribeScope;
@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
  * @author hanpengfei
  * @since 1.0
  */
-public abstract class AbstractTimestampSubscriberRegister
+public abstract class AbstractTimeStampedSubscriberRegister
         implements SubscriberRegister {
 
     @Override public <T extends Event> void register(Subscriber<T> subscriber) {
@@ -69,9 +69,9 @@ public abstract class AbstractTimestampSubscriberRegister
     /**
      * Returns the all subscribers of the current register.
      * <p>
-     * The implement invoked by {@link #unregister(Subscriber)},
-     * {@link #subscribersOf(Event)}, {@link #contains(Subscriber)},
-     * {@link #doRegister(TimeStampedSubscriber)}
+     * The implement invoked by {@link #unregister(Subscriber)}, {@link
+     * #subscribersOf(Event)}, {@link #contains(Subscriber)}, {@link
+     * #doRegister(TimeStampedSubscriber)}
      *
      * @return all subscribers collection, or an empty collection
      */
@@ -96,8 +96,8 @@ public abstract class AbstractTimestampSubscriberRegister
             }
 
             if (isSubscribed(subscriber, event)) {
-                @SuppressWarnings("unchecked") Subscriber<? super T> s = subscriber;
-                subscribers.add(s);
+                @SuppressWarnings("unchecked") Subscriber<? super T> source = subscriber.source;
+                subscribers.add(source);
             }
         }
         return Collections.unmodifiableSet(subscribers);
