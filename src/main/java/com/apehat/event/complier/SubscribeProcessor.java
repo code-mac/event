@@ -33,8 +33,8 @@ import java.util.Set;
 /**
  * The {@code Subscribe} and {@code Subscribers} annotation processor.
  * <p>
- * This processor will process annotation and onEvent at Java compiler. And
- * will change byte code.
+ * This processor will process annotation and onEvent at Java compiler. And will
+ * change byte code.
  *
  * @author hanpengfei
  * @since 1.0
