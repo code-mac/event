@@ -42,7 +42,7 @@ class ThreadSubscriberRegister extends AbstractTimestampSubscriberRegister {
     }
 
     @Override
-    public void clearThreadSubscribers() {
+    public void clear() {
         allSubscribers().clear();
     }
 }
