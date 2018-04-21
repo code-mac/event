@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.apehat.event.internal.subscriber;
+package com.apehat.event.register;
 
 import com.apehat.event.Event;
 import com.apehat.event.Subscriber;
@@ -28,7 +28,8 @@ import java.util.SortedSet;
  * @author hanpengfei
  * @since 1.0
  */
-public class SubscriberRAMRegister extends AbstractTimestampSubscriberRegister {
+public class SubscriberRAMRegister
+        extends AbstractTimeStampedSubscriberRegister {
 
     private final SubscriberRegister globalSubscriberRegister = new GlobalSubscriberRegister();
 
@@ -44,9 +45,6 @@ public class SubscriberRAMRegister extends AbstractTimestampSubscriberRegister {
         } else {
             threadSubscriberRegister.register(subscriber);
         }
-        //        globalSubscriberRegister.register(subscriber);
-        //        busSubscriberRegister.register(subscriber);
-        //        threadSubscriberRegister.register(subscriber);
     }
 
     @Override protected SortedSet<TimeStampedSubscriber<?>> allSubscribers() {
@@ -82,8 +80,8 @@ public class SubscriberRAMRegister extends AbstractTimestampSubscriberRegister {
     }
 
     /**
-     * Clear all subscribers of current thread in this register.
-     * The global subscribers and bus subscribers will not be clear.
+     * Clear all subscribers of current thread in this register. The global
+     * subscribers and bus subscribers will not be clear.
      *
      * @see com.apehat.event.SubscribeScope
      */
