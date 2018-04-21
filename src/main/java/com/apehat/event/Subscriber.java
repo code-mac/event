@@ -1,5 +1,5 @@
 /*
- * Copyright ApeHat.com
+ * Copyright Apehat.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ public interface Subscriber<T extends Event> {
     /**
      * Handle event when event occur.
      *
-     * @param event the event to handle
+     * @param event
+     *         the event to handle
      */
     void onEvent(T event);
 
