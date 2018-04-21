@@ -27,7 +27,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
  * @author hanpengfei
  * @since 1.0
  */
-public abstract class AbstractSubscriberRegister implements SubscriberRegister {
+public abstract class AbstractTimestampSubscriberRegister
+        implements SubscriberRegister {
 
     @Override
     public <T extends Event> void register(Subscriber<T> subscriber) {
