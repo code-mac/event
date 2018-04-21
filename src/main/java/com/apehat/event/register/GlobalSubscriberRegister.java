@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.apehat.event.internal.subscriber;
+package com.apehat.event.register;
 
 import com.apehat.event.SubscribeScope;
 import com.apehat.event.Subscriber;
@@ -28,7 +28,8 @@ import java.util.Set;
  * @author hanpengfei
  * @since 1.0
  */
-class GlobalSubscriberRegister extends AbstractTimestampSubscriberRegister {
+final class GlobalSubscriberRegister
+        extends AbstractTimeStampedSubscriberRegister {
 
     private static final Set<TimeStampedSubscriber<?>> SUBSCRIBERS = new HashSet<>();
 
