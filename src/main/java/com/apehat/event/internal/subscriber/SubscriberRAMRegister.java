@@ -28,7 +28,7 @@ import java.util.SortedSet;
  * @author hanpengfei
  * @since 1.0
  */
-public class DefaultSubscriberRegister extends AbstractSubscriberRegister {
+public class SubscriberRAMRegister extends AbstractTimestampSubscriberRegister {
 
     private final SubscriberRegister globalSubscriberRegister = new GlobalSubscriberRegister();
 
@@ -76,5 +76,10 @@ public class DefaultSubscriberRegister extends AbstractSubscriberRegister {
     @Override
     public boolean registrable(Subscriber<?> subscriber) {
         return subscriber != null;
+    }
+
+    @Override
+    public void clearThreadSubscribers() {
+        threadSubscriberRegister.clearThreadSubscribers();
     }
 }
