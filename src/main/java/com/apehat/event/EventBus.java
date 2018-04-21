@@ -107,7 +107,7 @@ public class EventBus {
      * This method should be invoke at started when use thread pool.
      */
     public EventBus reset() {
-        subscriberRegister.clearThreadSubscribers();
+        subscriberRegister.clear();
         return this;
     }
 
@@ -225,7 +225,7 @@ public class EventBus {
             }
 
             @Override
-            public void clearThreadSubscribers() {
+            public void clear() {
                 throw new UnsupportedOperationException();
             }
         };
