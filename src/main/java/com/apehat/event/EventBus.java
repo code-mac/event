@@ -16,16 +16,15 @@
 
 package com.apehat.event;
 
-import com.apehat.event.internal.subscriber.SubscriberRAMRegister;
-import com.apehat.event.internal.subscriber.SubscriberRegister;
-import org.slf4j.Logger;
+import com.apehat.event.register.EventQueue;
+import com.apehat.event.register.EventRAMQueue;
+import com.apehat.event.register.SubscriberRAMRegister;
+import com.apehat.event.register.SubscriberRegister;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -41,28 +40,28 @@ public class EventBus {
     private static final Builder DEFAULT_BUILDER = new Builder();
 
     /** The exception handler, be used to handle subscribe exception */
-    private final ExceptionHandler exceptionHandler;
-
-    /** The event queue be used to store events, what's waiting to publish. */
-    private final Queue<Event> eventQueue;
+    private final SubscribeExceptionHandler subscribeExceptionHandler;
 
     /** The subscriber register be used to register subscribers */
     private final SubscriberRegister subscriberRegister;
 
+    /** The event register be used to blocked events. */
+    private final EventQueue eventQueue;
+
     private final Lock publishLock;
 
     private EventBus(Builder builder) {
-        this.exceptionHandler = builder.exceptionHandler;
+        this.subscribeExceptionHandler = builder.subscribeExceptionHandler;
 
         publishLock = new ReentrantLock();
-        eventQueue = new ConcurrentLinkedQueue<>();
         subscriberRegister = new SubscriberRAMRegister();
+        eventQueue = new EventRAMQueue();
     }
 
     /**
-     * Returns the default event bus.
+     * Returns an event bus with default configuration.
      *
-     * @return the default event bus
+     * @return an event bus with default configuration
      */
     public static EventBus getDefault() {
         return DEFAULT_BUILDER.build();
@@ -77,10 +76,11 @@ public class EventBus {
      * Submit an event to publish. If the event queue don't have event, will
      * publish now.
      *
-     * @param event the event to publish
+     * @param event
+     *         the event to publish
      */
     public void submit(Event event) {
-        eventQueue.add(Objects.requireNonNull(event));
+        eventQueue.register(event);
         publish();
     }
 
@@ -101,7 +101,7 @@ public class EventBus {
         if (publishLock.tryLock()) {
             Event event;
             try {
-                while ((event = eventQueue.poll()) != null) {
+                while ((event = eventQueue.nextEvent()) != null) {
                     publishHelper(event);
                 }
             } finally {
@@ -121,8 +121,10 @@ public class EventBus {
     /**
      * Returns the subscribers of the specified event.
      *
-     * @param event the event to get subscribers
-     * @param <T>   the type of event
+     * @param event
+     *         the event to get subscribers
+     * @param <T>
+     *         the type of event
      * @return the subscribers of specified event
      */
     private <T extends Event> Set<Subscriber<? super T>> getSubscribers(
@@ -133,12 +135,15 @@ public class EventBus {
 
     /**
      * Invoke {@link Subscriber#onEvent(Event)} method, will throw exception
-     * when handle event, will use {@code exceptionHandler} to handle this
-     * exception
+     * when handle event, will use {@code subscribeExceptionHandler} to handle
+     * this exception
      *
-     * @param event      the event to be handled
-     * @param subscriber the subscriber
-     * @param <T>        the type of event
+     * @param event
+     *         the event to be handled
+     * @param subscriber
+     *         the subscriber
+     * @param <T>
+     *         the type of event
      */
     private <T extends Event> void invokeSubscriberHandler(T event,
                                                            Subscriber<? super T> subscriber) {
@@ -147,79 +152,91 @@ public class EventBus {
         try {
             subscriber.onEvent(event);
         } catch (Exception e) {
-            exceptionHandler.handle(e, event, subscriber);
+            subscribeExceptionHandler.handle(e, event, subscriber);
         }
     }
 
     /**
-     * Returns the exception exceptionHandler of this. If the exception
+     * Returns the exception subscribeExceptionHandler of this. If the exception
      * handler hadn't be set, will return {@code DEFAULT_EXCEPTION_HANDLER}
      *
-     * @return the exception exceptionHandler of this, or {@code
-     * DEFAULT_EXCEPTION_HANDLER} if the exception exceptionHandler hadn't be set
+     * @return the exception subscribeExceptionHandler of this, or {@code
+     * DEFAULT_EXCEPTION_HANDLER} if the exception subscribeExceptionHandler
+     * hadn't be set
      */
-    public ExceptionHandler getExceptionHandler() {
-        return exceptionHandler;
+    public SubscribeExceptionHandler getSubscribeExceptionHandler() {
+        return subscribeExceptionHandler;
     }
 
     /**
-     * Returns an unmodifiable subscriber subscriberRegister of the current event bus.
+     * Returns an unmodifiable subscriber subscriberRegister of the current
+     * event bus.
      * <p>
-     * The subscriberRegister can carried out query instructions, like
-     * {@link SubscriberRegister#subscribersOf(Event)} and so on.
-     * Else, will throw {@link UnsupportedOperationException}
+     * The subscriberRegister can carried out query instructions, like {@link
+     * SubscriberRegister#subscribersOf(Event)} and so on. Else, will throw
+     * {@link UnsupportedOperationException}
      *
-     * @return an unmodifiable subscriber subscriberRegister of the current event bus
+     * @return an unmodifiable subscriber subscriberRegister of the current
+     * event bus
      */
     public SubscriberRegister getSubscriberRegister() {
-        return new SubscriberRegister() {
-            @Override
-            public <T extends Event> void register(Subscriber<T> subscriber) {
-                throw new UnsupportedOperationException();
-            }
+        return new UnmodifiableSubscriberRegister(subscriberRegister);
+    }
 
-            @Override
-            public <T extends Event> void unregister(Subscriber<T> subscriber) {
-                throw new UnsupportedOperationException();
-            }
+    static class UnmodifiableSubscriberRegister implements SubscriberRegister {
 
-            @Override
-            public <T extends Event> Set<Subscriber<? super T>> subscribersOf(
-                    T event) {
-                Set<Subscriber<? super T>> subscribers = subscriberRegister
-                        .subscribersOf(event);
-                return Collections.unmodifiableSet(subscribers);
-            }
+        private final SubscriberRegister subscriberRegister;
 
-            @Override public boolean contains(Subscriber<?> subscriber) {
-                return subscriberRegister.contains(subscriber);
-            }
+        UnmodifiableSubscriberRegister(SubscriberRegister subscriberRegister) {
+            this.subscriberRegister = Objects
+                    .requireNonNull(subscriberRegister);
+        }
 
-            @Override public boolean registrable(Subscriber<?> subscriber) {
-                return subscriberRegister.registrable(subscriber);
-            }
-        };
+        @Override
+        public <T extends Event> void register(Subscriber<T> subscriber) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T extends Event> void unregister(Subscriber<T> subscriber) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T extends Event> Set<Subscriber<? super T>> subscribersOf(
+                T event) {
+            Set<Subscriber<? super T>> subscribers = subscriberRegister
+                    .subscribersOf(event);
+            return Collections.unmodifiableSet(subscribers);
+        }
+
+        @Override public boolean contains(Subscriber<?> subscriber) {
+            return subscriberRegister.contains(subscriber);
+        }
+
+        @Override public boolean registrable(Subscriber<?> subscriber) {
+            return subscriberRegister.registrable(subscriber);
+        }
     }
 
     /** Event Bus Builder */
     public static class Builder {
 
-        private static final Logger log = LoggerFactory
-                .getLogger(EventBus.class);
-
         /** The default exception handler, use logger to record exception. */
-        private static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER = new ExceptionLogger(
-                log);
+        private static final SubscribeExceptionHandler DEFAULT_EXCEPTION_HANDLER = new SubscribeExceptionLogger(
+                LoggerFactory.getLogger(EventBus.class));
 
-        private ExceptionHandler exceptionHandler;
+        private SubscribeExceptionHandler subscribeExceptionHandler;
 
         /**
-         * Sets the exception exceptionHandler of this.
+         * Sets the exception subscribeExceptionHandler of this.
          *
-         * @param exceptionHandler the exception exceptionHandler to be use
+         * @param subscribeExceptionHandler
+         *         the exception subscribeExceptionHandler to be use
          */
-        public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-            this.exceptionHandler = exceptionHandler;
+        public void setSubscribeExceptionHandler(
+                SubscribeExceptionHandler subscribeExceptionHandler) {
+            this.subscribeExceptionHandler = subscribeExceptionHandler;
         }
 
         /**
@@ -228,8 +245,8 @@ public class EventBus {
          * @return a event instance
          */
         public EventBus build() {
-            if (exceptionHandler == null) {
-                exceptionHandler = DEFAULT_EXCEPTION_HANDLER;
+            if (subscribeExceptionHandler == null) {
+                subscribeExceptionHandler = DEFAULT_EXCEPTION_HANDLER;
             }
             return new EventBus(this);
         }
