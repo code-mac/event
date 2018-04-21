@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.apehat.event.internal.subscriber;
+package com.apehat.event.register;
 
 import com.apehat.event.SubscribeScope;
 import com.apehat.event.Subscriber;
@@ -26,7 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author hanpengfei
  * @since 1.0
  */
-class ThreadSubscriberRegister extends AbstractTimestampSubscriberRegister {
+final class ThreadSubscriberRegister
+        extends AbstractTimeStampedSubscriberRegister {
 
     private final Map<Long, Set<TimeStampedSubscriber<?>>> threadMap = new ConcurrentHashMap<>();
 
