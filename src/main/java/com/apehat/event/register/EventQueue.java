@@ -14,21 +14,36 @@
  * limitations under the License.
  */
 
-package com.apehat.event.example.domain.user;
+package com.apehat.event.register;
 
-import com.apehat.event.Subscriber;
+import com.apehat.event.Event;
+
+import java.util.Queue;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public final class EmailSender implements Subscriber<UserEvent> {
+public interface EventQueue extends Queue<Event> {
 
-    @Override public Class<? extends UserEvent> subscribeTo() {
-        return UserEvent.class;
+    /**
+     * Register a blocked event to this register
+     *
+     * @param event
+     *         the event to register
+     * @throws NullPointerException
+     *         specified event is null
+     */
+    default void register(Event event) {
+        offer(event);
     }
 
-    @Override public void onEvent(UserEvent event) {
-        System.out.println(getClass() + " handle " + event);
+    /**
+     * Returns the next blocked event, or null, if no event be blocked.
+     *
+     * @return the next blocked event, or null, if no event be blocked
+     */
+    default Event nextEvent() {
+        return poll();
     }
 }
