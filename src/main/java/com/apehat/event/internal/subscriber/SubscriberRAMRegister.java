@@ -78,8 +78,14 @@ public class SubscriberRAMRegister extends AbstractTimestampSubscriberRegister {
         return subscriber != null;
     }
 
+    /**
+     * Clear all subscribers of current thread in this register.
+     * The global subscribers and bus subscribers will not be clear.
+     *
+     * @see com.apehat.event.SubscribeScope
+     */
     @Override
-    public void clearThreadSubscribers() {
-        threadSubscriberRegister.clearThreadSubscribers();
+    public void clear() {
+        threadSubscriberRegister.clear();
     }
 }
