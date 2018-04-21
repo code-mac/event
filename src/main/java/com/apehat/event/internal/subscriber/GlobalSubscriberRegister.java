@@ -20,17 +20,17 @@ import com.apehat.event.SubscribeScope;
 import com.apehat.event.Subscriber;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * @author hanpengfei
  * @since 1.0
  */
-public class GlobalSubscriberRegister extends AbstractSubscriberRegister {
+class GlobalSubscriberRegister extends AbstractTimestampSubscriberRegister {
 
-    private static final Set<TimeStampedSubscriber<?>> SUBSCRIBERS = new ConcurrentSkipListSet<>();
+    private static final Set<TimeStampedSubscriber<?>> SUBSCRIBERS = new HashSet<>();
 
     @Override
     protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
