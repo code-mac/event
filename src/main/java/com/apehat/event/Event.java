@@ -1,5 +1,5 @@
 /*
- * Copyright ApeHat.com
+ * Copyright Apehat.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,9 @@ public interface Event extends Serializable {
     long occurredOn();
 
     /**
-     * Returns the version of event. Default is {@link #INITIAL_VERSION}.
-     * If current is extended form others. This value should increasing form
-     * it's parent.
+     * Returns the version of event. Default is {@link #INITIAL_VERSION}. If
+     * current is extended form others. This value should increasing form it's
+     * parent.
      *
      * @return the version of event.
      */
