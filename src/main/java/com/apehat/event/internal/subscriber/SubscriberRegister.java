@@ -77,4 +77,12 @@ public interface SubscriberRegister {
      * otherwise false
      */
     boolean registrable(Subscriber<?> subscriber);
+
+    /**
+     * Clear subscribers of this register.
+     *
+     * @implSpec
+     */
+    default void clear() {
+    }
 }
