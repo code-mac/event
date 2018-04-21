@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author hanpengfei
  * @since 1.0
  */
-public class ThreadSubscriberRegister extends AbstractSubscriberRegister {
+class ThreadSubscriberRegister extends AbstractTimestampSubscriberRegister {
 
     private final Map<Long, Set<TimeStampedSubscriber<?>>> threadMap = new ConcurrentHashMap<>();
 
@@ -39,5 +39,10 @@ public class ThreadSubscriberRegister extends AbstractSubscriberRegister {
     @Override
     public boolean registrable(Subscriber<?> subscriber) {
         return Objects.equals(subscriber.scope(), SubscribeScope.THREAD);
+    }
+
+    @Override
+    public void clearThreadSubscribers() {
+        allSubscribers().clear();
     }
 }
