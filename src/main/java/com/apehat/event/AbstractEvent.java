@@ -39,11 +39,12 @@ public abstract class AbstractEvent implements Event {
 
     /**
      * When current is extension form other event, this constructor should be
-     * caller.
-     * At this time, the version should increase form parent version.
+     * caller. At this time, the version should increase form parent version.
      *
-     * @param occurredTimeMillis the occurred time millis of parent
-     * @throws IllegalArgumentException the parent version less than 1
+     * @param occurredTimeMillis
+     *         the occurred time millis of parent
+     * @throws IllegalArgumentException
+     *         the parent version less than 1
      * @see #version()
      */
     protected AbstractEvent(long occurredTimeMillis, int parentVersion,
@@ -70,6 +71,6 @@ public abstract class AbstractEvent implements Event {
     }
 
     @Override public String toString() {
-        return "AbstractEvent{" + "triggerId=" + triggerId + ", occurredTimeMillis=" + occurredTimeMillis + ", version=" + version + '}';
+        return "triggerId=" + triggerId + ", occurredTimeMillis=" + occurredTimeMillis + ", version=" + version;
     }
 }
