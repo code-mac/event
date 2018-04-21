@@ -24,18 +24,19 @@ import java.util.Objects;
  * @author hanpengfei
  * @since 1.0
  */
-public final class ExceptionLogger implements ExceptionHandler {
+public final class SubscribeExceptionLogger
+        implements SubscribeExceptionHandler {
 
     private final Logger logger;
 
-    public ExceptionLogger(Logger logger) {
+    public SubscribeExceptionLogger(Logger logger) {
         this.logger = Objects.requireNonNull(logger);
     }
 
     @Override
     public <T extends Event> void handle(Exception e, T event,
                                          Subscriber<? super T> subscriber) {
-        logger.error("Exception occurred on [{}] onEvent event [{}]: [{}]",
+        logger.error("Exception occurred on [{}] handle event [{}]; details: ",
                      subscriber, event, e);
     }
 }
