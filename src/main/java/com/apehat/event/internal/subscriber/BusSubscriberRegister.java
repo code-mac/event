@@ -32,13 +32,11 @@ class BusSubscriberRegister extends AbstractTimestampSubscriberRegister {
 
     private final Set<TimeStampedSubscriber<?>> subscribers = new HashSet<>();
 
-    @Override
-    protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
+    @Override protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
         return subscribers;
     }
 
-    @Override
-    public boolean registrable(Subscriber<?> subscriber) {
+    @Override public boolean registrable(Subscriber<?> subscriber) {
         return Objects.equals(subscriber.scope(), SubscribeScope.BUS);
     }
 }

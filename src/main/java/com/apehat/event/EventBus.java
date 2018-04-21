@@ -38,8 +38,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class EventBus {
 
-    private static final Logger log = LoggerFactory.getLogger(EventBus.class);
-
     private static final Builder DEFAULT_BUILDER = new Builder();
 
     /** The exception handler, be used to handle subscribe exception */
@@ -70,7 +68,8 @@ public class EventBus {
         return DEFAULT_BUILDER.build();
     }
 
-    public <T extends Event> void subscribe(Subscriber<? extends T> subscriber) {
+    public <T extends Event> void subscribe(
+            Subscriber<? extends T> subscriber) {
         subscriberRegister.register(subscriber);
     }
 
@@ -126,7 +125,8 @@ public class EventBus {
      * @param <T>   the type of event
      * @return the subscribers of specified event
      */
-    private <T extends Event> Set<Subscriber<? super T>> getSubscribers(T event) {
+    private <T extends Event> Set<Subscriber<? super T>> getSubscribers(
+            T event) {
         assert event != null;
         return subscriberRegister.subscribersOf(event);
     }
@@ -140,7 +140,8 @@ public class EventBus {
      * @param subscriber the subscriber
      * @param <T>        the type of event
      */
-    private <T extends Event> void invokeSubscriberHandler(T event, Subscriber<? super T> subscriber) {
+    private <T extends Event> void invokeSubscriberHandler(T event,
+                                                           Subscriber<? super T> subscriber) {
         assert event != null;
         assert subscriber != null;
         try {
@@ -183,25 +184,19 @@ public class EventBus {
             }
 
             @Override
-            public <T extends Event> Set<Subscriber<? super T>> subscribersOf(T event) {
+            public <T extends Event> Set<Subscriber<? super T>> subscribersOf(
+                    T event) {
                 Set<Subscriber<? super T>> subscribers = subscriberRegister
                         .subscribersOf(event);
                 return Collections.unmodifiableSet(subscribers);
             }
 
-            @Override
-            public boolean contains(Subscriber<?> subscriber) {
+            @Override public boolean contains(Subscriber<?> subscriber) {
                 return subscriberRegister.contains(subscriber);
             }
 
-            @Override
-            public boolean registrable(Subscriber<?> subscriber) {
+            @Override public boolean registrable(Subscriber<?> subscriber) {
                 return subscriberRegister.registrable(subscriber);
-            }
-
-            @Override
-            public void clear() {
-                throw new UnsupportedOperationException();
             }
         };
     }
@@ -209,8 +204,12 @@ public class EventBus {
     /** Event Bus Builder */
     public static class Builder {
 
+        private static final Logger log = LoggerFactory
+                .getLogger(EventBus.class);
+
         /** The default exception handler, use logger to record exception. */
-        private static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER = new ExceptionLogger(log);
+        private static final ExceptionHandler DEFAULT_EXCEPTION_HANDLER = new ExceptionLogger(
+                log);
 
         private ExceptionHandler exceptionHandler;
 

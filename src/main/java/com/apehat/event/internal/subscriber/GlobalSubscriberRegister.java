@@ -32,13 +32,11 @@ class GlobalSubscriberRegister extends AbstractTimestampSubscriberRegister {
 
     private static final Set<TimeStampedSubscriber<?>> SUBSCRIBERS = new HashSet<>();
 
-    @Override
-    protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
+    @Override protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
         return SUBSCRIBERS;
     }
 
-    @Override
-    public boolean registrable(Subscriber<?> subscriber) {
+    @Override public boolean registrable(Subscriber<?> subscriber) {
         return Objects.equals(SubscribeScope.GLOBAL, subscriber.scope());
     }
 }

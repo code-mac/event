@@ -1,5 +1,5 @@
 /*
- * Copyright ApeHat.com
+ * Copyright Apehat.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public abstract class AbstractEvent implements Event {
 
     protected AbstractEvent(TriggerId triggerId) {
         this.triggerId = Objects.requireNonNull(triggerId);
-        this.occurredTimeMillis = System.currentTimeMillis();
+        this.occurredTimeMillis = System.nanoTime();
         version = INITIAL_VERSION;
     }
 
@@ -46,32 +46,30 @@ public abstract class AbstractEvent implements Event {
      * @throws IllegalArgumentException the parent version less than 1
      * @see #version()
      */
-    protected AbstractEvent(long occurredTimeMillis, int parentVersion, TriggerId triggerId) {
+    protected AbstractEvent(long occurredTimeMillis, int parentVersion,
+                            TriggerId triggerId) {
         if (parentVersion < INITIAL_VERSION) {
-            throw new IllegalArgumentException("The version of parent mustn't less than 1.");
+            throw new IllegalArgumentException(
+                    "The version of parent mustn't less than 1.");
         }
         this.triggerId = Objects.requireNonNull(triggerId);
         this.occurredTimeMillis = occurredTimeMillis;
         version = parentVersion + 1;
     }
 
-    @Override
-    public TriggerId triggerId() {
+    @Override public TriggerId triggerId() {
         return triggerId;
     }
 
-    @Override
-    public long occurredOn() {
+    @Override public long occurredOn() {
         return occurredTimeMillis;
     }
 
-    @Override
-    public int version() {
+    @Override public int version() {
         return version;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return "AbstractEvent{" + "triggerId=" + triggerId + ", occurredTimeMillis=" + occurredTimeMillis + ", version=" + version + '}';
     }
 }

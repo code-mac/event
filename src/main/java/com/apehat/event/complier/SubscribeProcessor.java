@@ -50,12 +50,13 @@ public final class SubscribeProcessor extends AbstractProcessor {
     }
 
     private void error(Element element, Object... args) {
-        messager.printMessage(Diagnostic.Kind.ERROR, String
-                .format("Only element can be annotated with @%s", args), element);
+        messager.printMessage(Diagnostic.Kind.ERROR, String.format(
+                "Only element can be annotated with @%s", args), element);
     }
 
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    public boolean process(Set<? extends TypeElement> annotations,
+                           RoundEnvironment roundEnv) {
 
         Set<AnnotatedMethod> methods = new HashSet<>();
 
@@ -65,7 +66,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
         return true;
     }
 
-    private Set<AnnotatedMethod> subscriberAnnotatedMethods(RoundEnvironment roundEnv) {
+    private Set<AnnotatedMethod> subscriberAnnotatedMethods(
+            RoundEnvironment roundEnv) {
         Set<AnnotatedMethod> methods = new HashSet<>();
         // the elements what had be annotated by Subscriber
         Set<? extends Element> subAnnotationMethods = roundEnv
@@ -73,7 +75,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
         for (Element element : subAnnotationMethods) {
             Subscribe subscribe = element.getAnnotation(Subscribe.class);
             try {
-                AnnotatedMethod method = new AnnotatedMethod(subscribe, element);
+                AnnotatedMethod method = new AnnotatedMethod(subscribe,
+                                                             element);
                 methods.add(method);
             } catch (IllegalArgumentException e) {
                 error(element, Subscribe.class);
@@ -83,7 +86,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
         return methods;
     }
 
-    private Set<AnnotatedMethod> subscribersAnnotatedMethods(RoundEnvironment roundEnv) {
+    private Set<AnnotatedMethod> subscribersAnnotatedMethods(
+            RoundEnvironment roundEnv) {
         Set<AnnotatedMethod> methods = new HashSet<>();
         // the elements what had be annotated by Subscribers
         Set<? extends Element> subsAnnotationMethods = roundEnv
@@ -95,7 +99,8 @@ public final class SubscribeProcessor extends AbstractProcessor {
                 Subscribes subscribes = element.getAnnotation(Subscribes.class);
                 Subscribe[] subs = subscribes.value();
                 for (Subscribe subscribe : subs) {
-                    AnnotatedMethod method = new AnnotatedMethod(subscribe, element);
+                    AnnotatedMethod method = new AnnotatedMethod(subscribe,
+                                                                 element);
                     methods.add(method);
                 }
             }
@@ -107,20 +112,18 @@ public final class SubscribeProcessor extends AbstractProcessor {
     }
 
     private void processSubscribe(Set<AnnotatedMethod> methods) {
-        messager.printMessage(Diagnostic.Kind.NOTE, "Process " + methods
-                .toString());
+        messager.printMessage(Diagnostic.Kind.NOTE,
+                              "Process " + methods.toString());
     }
 
-    @Override
-    public Set<String> getSupportedAnnotationTypes() {
+    @Override public Set<String> getSupportedAnnotationTypes() {
         Set<String> names = new HashSet<>();
         names.add(Subscribe.class.getName());
         names.add(Subscribes.class.getName());
         return Collections.unmodifiableSet(names);
     }
 
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
+    @Override public SourceVersion getSupportedSourceVersion() {
         return SourceVersion.latestSupported();
     }
 
@@ -153,8 +156,7 @@ public final class SubscribeProcessor extends AbstractProcessor {
             return false;
         }
 
-        @Override
-        public boolean equals(Object o) {
+        @Override public boolean equals(Object o) {
             if (o == this) {
                 return true;
             }
@@ -166,16 +168,14 @@ public final class SubscribeProcessor extends AbstractProcessor {
                     .equals(method.element);
         }
 
-        @Override
-        public int hashCode() {
+        @Override public int hashCode() {
             int hash = 203;
             hash += 31 * hash + annotation.hashCode();
             hash += 31 * hash + element.hashCode();
             return hash;
         }
 
-        @Override
-        public String toString() {
+        @Override public String toString() {
             return "AnnotatedMethod{" + "annotation=" + annotation + ", element=" + element + '}';
         }
     }

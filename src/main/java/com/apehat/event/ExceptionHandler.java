@@ -31,5 +31,6 @@ public interface ExceptionHandler {
      * @param subscriber the subscriber
      * @param <T>        the type of event
      */
-    <T extends Event> void handle(Exception e, T event, Subscriber<? super T> subscriber);
+    <T extends Event> void handle(Exception e, T event,
+                                  Subscriber<? super T> subscriber);
 }

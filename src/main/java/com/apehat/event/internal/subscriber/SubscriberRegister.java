@@ -84,5 +84,7 @@ public interface SubscriberRegister {
      * @implSpec
      */
     default void clear() {
+        throw new UnsupportedOperationException(
+                getClass() + " not support " + "clear subscribers.");
     }
 }

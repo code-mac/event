@@ -20,21 +20,11 @@ package com.apehat.event.example.domain.user;
  * @author hanpengfei
  * @since 1.0
  */
-public final class UserRegistered extends UserEvent {
+public interface ContactInfo {
 
-    private final String username;
+    Type type();
 
-    public UserRegistered(UserId userId, String username) {
-        super(userId);
-        this.username = username;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    @Override public String toString() {
-        return "UserRegistered{" + "username='" + username + '\'' + "} " + super
-                .toString();
+    enum Type {
+        EMAIL, PHONE_NUMBER
     }
 }

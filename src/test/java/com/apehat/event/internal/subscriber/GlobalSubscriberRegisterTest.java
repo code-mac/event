@@ -37,32 +37,36 @@ public class GlobalSubscriberRegisterTest {
 
     private static int invocationCount = 800;
 
+    @AfterClass public static void afterClass() {
+        GlobalSubscriberRegister subscriberRegister = (GlobalSubscriberRegister) register;
+        int                      size               = subscriberRegister
+                .allSubscribers().size();
+        System.out.println("Expected: " + invocationCount);
+        System.out.println("Current: " + size);
+        assert size == invocationCount;
+    }
+
     @Test(threadPoolSize = 5, invocationCount = 800)
     public void testRegister() {
         register.register(new Subscriber<Event>() {
-            @Override
-            public Class<? extends Event> subscribeTo() {
+            @Override public Class<? extends Event> subscribeTo() {
                 return Event.class;
             }
 
-            @Override
-            public void onEvent(Event event) {
+            @Override public void onEvent(Event event) {
             }
 
-            @Override
-            public SubscribeScope scope() {
+            @Override public SubscribeScope scope() {
                 return SubscribeScope.GLOBAL;
             }
 
-            @Override
-            public boolean equals(Object obj) {
+            @Override public boolean equals(Object obj) {
                 return false;
             }
 
-            @Override
-            public int hashCode() {
+            @Override public int hashCode() {
                 Random random = new Random();
-                int code = random.nextInt();
+                int    code   = random.nextInt();
                 while (hashCodes.contains(code)) {
                     code = random.nextInt();
                 }
@@ -70,14 +74,5 @@ public class GlobalSubscriberRegisterTest {
                 return code;
             }
         });
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        GlobalSubscriberRegister subscriberRegister = (GlobalSubscriberRegister) register;
-        int size = subscriberRegister.allSubscribers().size();
-        System.out.println("Expected: " + invocationCount);
-        System.out.println("Current: " + size);
-        assert size == invocationCount;
     }
 }

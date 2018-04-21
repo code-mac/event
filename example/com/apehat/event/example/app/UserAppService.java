@@ -36,7 +36,7 @@ public final class UserAppService {
 
     public void register(String username, String password) {
         UserId userId = new UserId(UUID.randomUUID().toString());
-        User user = new User(userId, username, password);
+        User   user   = new User(userId, username, password);
         getUserRepository().store(user);
     }
 

@@ -32,8 +32,7 @@ public final class UserId implements TriggerId {
         this.source = Objects.requireNonNull(source);
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return source;
     }
 }

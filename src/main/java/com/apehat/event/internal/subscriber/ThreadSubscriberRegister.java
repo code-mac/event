@@ -30,19 +30,16 @@ class ThreadSubscriberRegister extends AbstractTimestampSubscriberRegister {
 
     private final Map<Long, Set<TimeStampedSubscriber<?>>> threadMap = new ConcurrentHashMap<>();
 
-    @Override
-    protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
-        return threadMap.computeIfAbsent(Thread.currentThread()
-                .getId(), k -> new HashSet<>());
+    @Override protected Collection<TimeStampedSubscriber<?>> allSubscribers() {
+        return threadMap.computeIfAbsent(Thread.currentThread().getId(),
+                                         k->new HashSet<>());
     }
 
-    @Override
-    public boolean registrable(Subscriber<?> subscriber) {
+    @Override public boolean registrable(Subscriber<?> subscriber) {
         return Objects.equals(subscriber.scope(), SubscribeScope.THREAD);
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         allSubscribers().clear();
     }
 }

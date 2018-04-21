@@ -30,10 +30,15 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public abstract class AbstractTimestampSubscriberRegister
         implements SubscriberRegister {
 
-    @Override
-    public <T extends Event> void register(Subscriber<T> subscriber) {
+    @Override public <T extends Event> void register(Subscriber<T> subscriber) {
+        if (!registrable(subscriber)) {
+            throw new IllegalArgumentException(String.format(
+                    "%s unsupported register to %s. Excepted: %s. owned: %s",
+                    subscriber, getClass(), subscriber.scope(),
+                    subscriber.scope()));
+        }
         TimeStampedSubscriber<T> timeStampedSubscriber = cast(subscriber);
-        if (registrable(timeStampedSubscriber) && !contains(timeStampedSubscriber)) {
+        if (!contains(timeStampedSubscriber)) {
             doRegister(timeStampedSubscriber);
         }
     }
@@ -51,8 +56,7 @@ public abstract class AbstractTimestampSubscriberRegister
         return doSearchByEvent(allSubscribers(), Objects.requireNonNull(event));
     }
 
-    @Override
-    public boolean contains(Subscriber<?> subscriber) {
+    @Override public boolean contains(Subscriber<?> subscriber) {
         return subscriber != null && allSubscribers()
                 .contains(cast(subscriber));
     }
@@ -73,11 +77,14 @@ public abstract class AbstractTimestampSubscriberRegister
      */
     protected abstract Collection<TimeStampedSubscriber<?>> allSubscribers();
 
-    private <T extends Event> Set<Subscriber<? super T>> doSearchByEvent(Collection<TimeStampedSubscriber<?>> registeredSubscribers, T event) {
+    private <T extends Event> Set<Subscriber<? super T>> doSearchByEvent(
+            Collection<TimeStampedSubscriber<?>> registeredSubscribers,
+            T event) {
         assert registeredSubscribers != null;
         assert event != null;
 
-        registeredSubscribers = new ConcurrentSkipListSet<>(registeredSubscribers);
+        registeredSubscribers = new ConcurrentSkipListSet<>(
+                registeredSubscribers);
 
         Set<Subscriber<? super T>> subscribers = new HashSet<>();
         for (TimeStampedSubscriber subscriber : registeredSubscribers) {
@@ -96,7 +103,8 @@ public abstract class AbstractTimestampSubscriberRegister
         return Collections.unmodifiableSet(subscribers);
     }
 
-    private boolean isSubscribeAfter(TimeStampedSubscriber subscriber, Event event) {
+    private boolean isSubscribeAfter(TimeStampedSubscriber subscriber,
+                                     Event event) {
         return subscriber.timestamp > event.occurredOn();
     }
 
@@ -104,10 +112,11 @@ public abstract class AbstractTimestampSubscriberRegister
         return subscriber.subscribeTo().isAssignableFrom(event.getClass());
     }
 
-    private <T extends Event> TimeStampedSubscriber<T> cast(Subscriber<T> subscriber) {
-        return (subscriber instanceof TimeStampedSubscriber) ?
-               (TimeStampedSubscriber<T>) subscriber :
-               new TimeStampedSubscriber<>(subscriber);
+    private <T extends Event> TimeStampedSubscriber<T> cast(
+            Subscriber<T> subscriber) {
+        return (subscriber instanceof TimeStampedSubscriber)
+               ? (TimeStampedSubscriber<T>) subscriber
+               : new TimeStampedSubscriber<>(subscriber);
     }
 
     protected static class TimeStampedSubscriber<T extends Event>
@@ -122,23 +131,19 @@ public abstract class AbstractTimestampSubscriberRegister
             this.timestamp = System.currentTimeMillis();
         }
 
-        @Override
-        public Class<? extends T> subscribeTo() {
+        @Override public Class<? extends T> subscribeTo() {
             return source.subscribeTo();
         }
 
-        @Override
-        public void onEvent(T event) {
+        @Override public void onEvent(T event) {
             source.onEvent(event);
         }
 
-        @Override
-        public SubscribeScope scope() {
+        @Override public SubscribeScope scope() {
             return source.scope();
         }
 
-        @Override
-        public boolean equals(Object o) {
+        @Override public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
@@ -151,13 +156,11 @@ public abstract class AbstractTimestampSubscriberRegister
             return false;
         }
 
-        @Override
-        public int hashCode() {
+        @Override public int hashCode() {
             return source.hashCode();
         }
 
-        @Override
-        public int compareTo(TimeStampedSubscriber o) {
+        @Override public int compareTo(TimeStampedSubscriber o) {
             long value = timestamp - o.timestamp;
             if (value > 0) {
                 return 1;

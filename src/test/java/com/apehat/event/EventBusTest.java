@@ -27,17 +27,18 @@ public class EventBusTest {
 
     static int count = 0;
 
-    @Test(threadPoolSize = 2, invocationCount = 300)
-    public void testSubmit() {
+    @AfterClass public static void tearDown() {
+        System.out.println(count);
+    }
+
+    @Test(threadPoolSize = 2, invocationCount = 300) public void testSubmit() {
         EventBus eventBus = EventBus.getDefault().reset();
         eventBus.subscribe(new Subscriber<Event>() {
-            @Override
-            public Class<? extends Event> subscribeTo() {
+            @Override public Class<? extends Event> subscribeTo() {
                 return Event.class;
             }
 
-            @Override
-            public void onEvent(Event event) {
+            @Override public void onEvent(Event event) {
                 System.out.println("Handle event " + event);
                 count++;
             }
@@ -46,17 +47,11 @@ public class EventBusTest {
         eventBus.submit(e);
     }
 
-    @AfterClass
-    public static void tearDown() {
-        System.out.println(count);
-    }
-
     private class E extends AbstractEvent {
 
         E(String id) {
             super(new TriggerId() {
-                @Override
-                public String toString() {
+                @Override public String toString() {
                     return id;
                 }
             });

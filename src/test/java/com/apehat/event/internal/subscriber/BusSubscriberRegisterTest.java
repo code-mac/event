@@ -25,9 +25,6 @@ import org.testng.annotations.Test;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
-
-import static org.testng.Assert.*;
 
 /**
  * @author hanpengfei
@@ -40,32 +37,36 @@ public class BusSubscriberRegisterTest {
 
     private static int invocationCount = 800;
 
+    @AfterClass public static void afterClass() {
+        AbstractTimestampSubscriberRegister subscriberRegister = (AbstractTimestampSubscriberRegister) register;
+        int                                 size               = subscriberRegister
+                .allSubscribers().size();
+        System.out.println("Expected: " + invocationCount);
+        System.out.println("Current: " + size);
+        assert size == invocationCount;
+    }
+
     @Test(threadPoolSize = 5, invocationCount = 800)
     public void testRegister() {
         register.register(new Subscriber<Event>() {
-            @Override
-            public Class<? extends Event> subscribeTo() {
+            @Override public Class<? extends Event> subscribeTo() {
                 return Event.class;
             }
 
-            @Override
-            public void onEvent(Event event) {
+            @Override public void onEvent(Event event) {
             }
 
-            @Override
-            public SubscribeScope scope() {
+            @Override public SubscribeScope scope() {
                 return SubscribeScope.BUS;
             }
 
-            @Override
-            public boolean equals(Object obj) {
+            @Override public boolean equals(Object obj) {
                 return false;
             }
 
-            @Override
-            public int hashCode() {
+            @Override public int hashCode() {
                 Random random = new Random();
-                int code = random.nextInt();
+                int    code   = random.nextInt();
                 while (hashCodes.contains(code)) {
                     code = random.nextInt();
                 }
@@ -73,14 +74,5 @@ public class BusSubscriberRegisterTest {
                 return code;
             }
         });
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        AbstractTimestampSubscriberRegister subscriberRegister = (AbstractTimestampSubscriberRegister) register;
-        int size = subscriberRegister.allSubscribers().size();
-        System.out.println("Expected: " + invocationCount);
-        System.out.println("Current: " + size);
-        assert size == invocationCount;
     }
 }

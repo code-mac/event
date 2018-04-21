@@ -26,8 +26,7 @@ import org.testng.annotations.Test;
  */
 public class Main {
 
-    @Test
-    public void testRegister() {
+    @Test public void testRegister() {
         String username = "aUsername";
         String password = "aPassword";
         new UserAppService(new MemUserRepository())

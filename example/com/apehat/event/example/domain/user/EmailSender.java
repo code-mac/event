@@ -24,13 +24,11 @@ import com.apehat.event.Subscriber;
  */
 public final class EmailSender implements Subscriber<UserEvent> {
 
-    @Override
-    public Class<? extends UserEvent> subscribeTo() {
+    @Override public Class<? extends UserEvent> subscribeTo() {
         return UserEvent.class;
     }
 
-    @Override
-    public void onEvent(UserEvent event) {
+    @Override public void onEvent(UserEvent event) {
         System.out.println(getClass() + " handle " + event);
     }
 }

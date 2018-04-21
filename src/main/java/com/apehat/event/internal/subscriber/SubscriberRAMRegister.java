@@ -36,15 +36,20 @@ public class SubscriberRAMRegister extends AbstractTimestampSubscriberRegister {
 
     private final ThreadSubscriberRegister threadSubscriberRegister = new ThreadSubscriberRegister();
 
-    @Override
-    protected void doRegister(TimeStampedSubscriber<?> subscriber) {
-        globalSubscriberRegister.register(subscriber);
-        busSubscriberRegister.register(subscriber);
-        threadSubscriberRegister.register(subscriber);
+    @Override protected void doRegister(TimeStampedSubscriber<?> subscriber) {
+        if (globalSubscriberRegister.registrable(subscriber)) {
+            globalSubscriberRegister.register(subscriber);
+        } else if (busSubscriberRegister.registrable(subscriber)) {
+            busSubscriberRegister.register(subscriber);
+        } else {
+            threadSubscriberRegister.register(subscriber);
+        }
+        //        globalSubscriberRegister.register(subscriber);
+        //        busSubscriberRegister.register(subscriber);
+        //        threadSubscriberRegister.register(subscriber);
     }
 
-    @Override
-    protected SortedSet<TimeStampedSubscriber<?>> allSubscribers() {
+    @Override protected SortedSet<TimeStampedSubscriber<?>> allSubscribers() {
         // needn't impl
         return null;
     }
@@ -65,16 +70,14 @@ public class SubscriberRAMRegister extends AbstractTimestampSubscriberRegister {
         return Collections.unmodifiableSet(subscribers);
     }
 
-    @Override
-    public boolean contains(Subscriber<?> subscriber) {
+    @Override public boolean contains(Subscriber<?> subscriber) {
         return globalSubscriberRegister
                 .contains(subscriber) || busSubscriberRegister
                 .contains(subscriber) || threadSubscriberRegister
                 .contains(subscriber);
     }
 
-    @Override
-    public boolean registrable(Subscriber<?> subscriber) {
+    @Override public boolean registrable(Subscriber<?> subscriber) {
         return subscriber != null;
     }
 
@@ -84,8 +87,7 @@ public class SubscriberRAMRegister extends AbstractTimestampSubscriberRegister {
      *
      * @see com.apehat.event.SubscribeScope
      */
-    @Override
-    public void clear() {
+    @Override public void clear() {
         threadSubscriberRegister.clear();
     }
 }

@@ -30,12 +30,14 @@ public final class User {
 
     private String username;
     private String password;
-    private String email;
+    private ContactInfo contactInfo;
 
-    public User(UserId userId, String username, String password) {
+    public User(UserId userId, ContactInfo contactInfo, String username,
+                String password) {
         this.userId = Objects.requireNonNull(userId);
         setUsername(username);
         this.password = Objects.requireNonNull(password);
+        this.contactInfo = Objects.requireNonNull(contactInfo);
 
         EventBus.getDefault().submit(new UserRegistered(userId, username));
     }
@@ -48,7 +50,8 @@ public final class User {
         return username;
     }
 
-    public void changePassword(final String oldPassword, final String newPassword)
+    public void changePassword(final String oldPassword,
+                               final String newPassword)
             throws IllegalAccessException {
         Objects.requireNonNull(oldPassword);
         Objects.requireNonNull(newPassword);
@@ -63,8 +66,7 @@ public final class User {
         return userId;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return "User{" + "userId=" + userId + ", username='" + username + '\'' + ", password='" + password + '\'' + '}';
     }
 }

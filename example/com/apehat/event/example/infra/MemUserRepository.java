@@ -24,8 +24,7 @@ import com.apehat.event.example.domain.user.UserRepository;
  * @since 1.0
  */
 public class MemUserRepository implements UserRepository {
-    @Override
-    public void store(User user) {
+    @Override public void store(User user) {
         System.out.println("Stored user " + user);
     }
 }
