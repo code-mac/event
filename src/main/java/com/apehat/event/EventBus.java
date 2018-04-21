@@ -16,7 +16,7 @@
 
 package com.apehat.event;
 
-import com.apehat.event.internal.subscriber.DefaultSubscriberRegister;
+import com.apehat.event.internal.subscriber.SubscriberRAMRegister;
 import com.apehat.event.internal.subscriber.SubscriberRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class EventBus {
     private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
 
     /** The subscriber register be used to register subscribers */
-    private final SubscriberRegister subscriberRegister = new DefaultSubscriberRegister();
+    private final SubscriberRegister subscriberRegister = new SubscriberRAMRegister();
 
     private final Lock publishLock = new ReentrantLock();
 
@@ -102,6 +102,16 @@ public class EventBus {
     }
 
     /**
+     * Clear all subscribers of this event bus in current thread.
+     * <p>
+     * This method should be invoke at started when use thread pool.
+     */
+    public EventBus reset() {
+        subscriberRegister.clearThreadSubscribers();
+        return this;
+    }
+
+    /**
      * Check {@code eventQueue} and publish event
      */
     private void publish() {
@@ -134,9 +144,6 @@ public class EventBus {
      */
     private <T extends Event> Set<Subscriber<? super T>> getSubscribers(T event) {
         assert event != null;
-        // convert safe;
-        // the event type must be Class<T>
-        // determine by parameter
         return subscriberRegister.subscribersOf(event);
     }
 
@@ -215,6 +222,11 @@ public class EventBus {
             @Override
             public boolean registrable(Subscriber<?> subscriber) {
                 return subscriberRegister.registrable(subscriber);
+            }
+
+            @Override
+            public void clearThreadSubscribers() {
+                throw new UnsupportedOperationException();
             }
         };
     }
