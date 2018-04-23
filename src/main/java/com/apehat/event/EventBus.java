@@ -25,12 +25,19 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The class {@code EventBus} is be used as facade to subscribe and submit
  * event.
+ * <p>
+ * TODO 去掉 Scope, 利用子类，通过策略模式获取订阅者, EventBus 本身持有 Subscribers
+ * <p>
+ * TODO 如上，不应该提供 Reset 域
+ * <p>
+ * TODO 添加 Id 域，EventBus 自身生成 Id
  *
  * @author hanpengfei
  * @since 1.0
@@ -49,8 +56,10 @@ public class EventBus {
     private final EventQueue eventQueue;
 
     private final Lock publishLock;
+    private final String id;
 
     private EventBus(Builder builder) {
+        this.id = builder.id;
         this.subscribeExceptionHandler = builder.subscribeExceptionHandler;
 
         publishLock = new ReentrantLock();
@@ -114,7 +123,7 @@ public class EventBus {
         assert event != null;
         Set<Subscriber<? super T>> subscribers = getSubscribers(event);
         for (Subscriber<? super T> subscriber : subscribers) {
-            invokeSubscriberHandler(event, subscriber);
+            invokeSubscriberHandler(subscriber, event);
         }
     }
 
@@ -145,8 +154,8 @@ public class EventBus {
      * @param <T>
      *         the type of event
      */
-    private <T extends Event> void invokeSubscriberHandler(T event,
-                                                           Subscriber<? super T> subscriber) {
+    private <T extends Event> void invokeSubscriberHandler(
+            Subscriber<? super T> subscriber, T event) {
         assert event != null;
         assert subscriber != null;
         try {
@@ -181,6 +190,15 @@ public class EventBus {
      */
     public SubscriberRegister getSubscriberRegister() {
         return new UnmodifiableSubscriberRegister(subscriberRegister);
+    }
+
+    /**
+     * Returns the id of this.
+     *
+     * @return the id of this.
+     */
+    public String getId() {
+        return id;
     }
 
     static class UnmodifiableSubscriberRegister implements SubscriberRegister {
@@ -222,11 +240,12 @@ public class EventBus {
     /** Event Bus Builder */
     public static class Builder {
 
-        /** The default exception handler, use logger to record exception. */
-        private static final SubscribeExceptionHandler DEFAULT_EXCEPTION_HANDLER = new SubscribeExceptionLogger(
-                LoggerFactory.getLogger(EventBus.class));
-
+        private final String id;
         private SubscribeExceptionHandler subscribeExceptionHandler;
+
+        public Builder() {
+            this.id = UUID.randomUUID().toString().toUpperCase();
+        }
 
         /**
          * Sets the exception subscribeExceptionHandler of this.
@@ -246,7 +265,8 @@ public class EventBus {
          */
         public EventBus build() {
             if (subscribeExceptionHandler == null) {
-                subscribeExceptionHandler = DEFAULT_EXCEPTION_HANDLER;
+                subscribeExceptionHandler = new SubscribeExceptionLogger(
+                        LoggerFactory.getLogger(EventBus.class));
             }
             return new EventBus(this);
         }
